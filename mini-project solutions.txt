@@ -1,0 +1,66 @@
+Lab 4 Solutions
+
+http://localhost:4200                                                                                                                                                                                 
+                                                                                                                                                                                                           
+ll                                                                                                                                                                                                         
+                                                                                                                                                                                                           
+cd LabFiles        
+
+hadoop fs -ls '/data/text_moby/' 
+
+                                                                                                                                                                                                         
+hive                                                                                                                                          
+                                                                                                                                                                                                           
+use wasadmin_db;                                                                                                                                                                                       
+                                                                                                                                                                                                           
+show tables;     
+                                                                                                                                                                                          
+create external table moby (line string) row format delimited fields terminated by '\n' stored as textfile location '/data/text_moby' ;
+
+select * from moby limit 10;
+                           
+SELECT explode(ngrams(sentences(lower(line)), 1, 20 )) FROM moby;
+                                                                                                                                                                                
+SELECT explode(ngrams(sentences(lower(line)), 2, 20 )) FROM moby;
+
+SELECT explode(ngrams(sentences(lower(line)), 3, 20 )) FROM moby;
+
+
+SELECT explode(context_ngrams(sentences(lower(line)), array(“white”, “whale”,null), 20 )) FROM moby;
+
+SELECT explode(context_ngrams(sentences(lower(line)), array(“sperm”, “whale”,null), 20 )) FROM moby;
+
+SELECT explode(context_ngrams(sentences(lower(line)), array("white", null), 20 )) FROM moby;  
+
+
+!q
+
+-------------------  Bonus ----------------------
+
+
+
+hive
+
+use wasadmin_db;
+
+
+•	sotu-2014-obama.txt : State of the Union address 2014
+
+create external table sotu (line string) row format delimited fields terminated by '\n' stored as textfile location '/data/text_sotu' ;
+
+For State of the union text
+Find the word the follows the word american
+
+        SELECT explode(context_ngrams(sentences(lower(line)), array("american", null), 30))  FROM sotu ;
+
+
+•	FOMC20080916meeting.txt : Feds emergency meeting after 2008 financial crisis (un-classified after 5 years)
+
+create external table fomc (line string) row format delimited fields terminated by '\n' stored as textfile location '/data/text_fomc' ;
+
+Feds Meeting minute
+Find the most used adjective used to describe the word market.
+
+SELECT explode(context_ngrams(sentences(lower(line)),  array(null, "markets"), 30))  FROM fomc ;
+
+!q
